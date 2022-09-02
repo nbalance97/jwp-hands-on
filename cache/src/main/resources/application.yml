@@ -1,2 +1,8 @@
 handlebars:
   suffix: .html
+
+server:
+  compression:
+    enabled: true
+    mime-types: application/json,text/html,text/css,text/javascript,application/javascript,text/plain,text/xml
+    min-response-size: 10
