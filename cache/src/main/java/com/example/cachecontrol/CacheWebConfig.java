@@ -19,15 +19,6 @@ import com.google.common.net.HttpHeaders;
 public class CacheWebConfig implements WebMvcConfigurer {
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        CacheControl cacheControl = CacheControl.noCache().cachePrivate();
-
-        registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/templates/")
-                .setCacheControl(cacheControl);
-    }
-
-    @Override
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(new CacheIgnore())
                 .addPathPatterns("**");
