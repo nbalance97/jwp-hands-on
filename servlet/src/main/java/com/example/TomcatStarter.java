@@ -21,7 +21,7 @@ public class TomcatStarter {
         tomcat.setConnector(createConnector());
 
         final var docBase = new File(webappDirLocation).getAbsolutePath();
-        tomcat.addWebapp("", docBase);
+        tomcat.addWebapp("", docBase); // docBase에 있는 모든 Servlet load
     }
 
     public void start() throws LifecycleException {

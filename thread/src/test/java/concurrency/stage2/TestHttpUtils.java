@@ -7,6 +7,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
+import javax.servlet.http.HttpSession;
+
 public class TestHttpUtils {
 
     private static final HttpClient httpClient = HttpClient.newBuilder()
