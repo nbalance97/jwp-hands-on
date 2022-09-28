@@ -5,7 +5,8 @@ import java.util.Set;
 /**
  * 스프링의 BeanFactory, ApplicationContext에 해당되는 클래스
  */
-class DIContainer {
+class
+DIContainer {
 
     private final Set<Object> beans;
 

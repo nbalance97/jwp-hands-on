@@ -9,3 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Inject {
 }
+
+// spring의 Autowired
+// 자바 표준에서는 Inject라는 어노테이션으로 주입해 준다.
