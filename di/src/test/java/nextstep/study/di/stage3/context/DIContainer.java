@@ -65,7 +65,8 @@ class DIContainer {
 
 
                 // field.getDeclaringClass() : 필드를 선언한 클래스의 타입임. 필드의 타입 아님!!
-                // field.getType()가 필드의 타입이다.
+                // field.getType()가 필드의 타입이다.이
+                // 인터페이스타입.isAssignableFrom(구현타입)은 구현타입이 인터페이스의 구현타입인지 확인 가능하다.
                 Object bean = beans.stream()
                         .filter(b -> field.getType().isAssignableFrom(b.getClass()))
                         .findAny()
@@ -77,7 +78,7 @@ class DIContainer {
                     continue;
                 }
 
-                // 모든 과정을 넘어왔다면 빈을 주입할 수 있다. 축하한다!
+                // 모든 과정을 넘어왔다면 빈을 주입할 수 있다.
                 try {
                     field.set(instance, bean);
                 } catch (IllegalAccessException e) {
