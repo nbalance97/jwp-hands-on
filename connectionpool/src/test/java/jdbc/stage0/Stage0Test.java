@@ -4,6 +4,7 @@ import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,10 +27,10 @@ class Stage0Test {
      * https://docs.oracle.com/javadb/10.8.3.0/ref/rrefjdbc4_0summary.html
      */
     @Test
-    void driverManager() throws SQLException {
+    void driverManager() throws SQLException, ClassNotFoundException {
         // Class.forName("org.h2.Driver"); // JDBC 4.0 부터 생략 가능
         // DriverManager 클래스를 활용하여 static 변수의 정보를 활용하여 h2 db에 연결한다.
-        try (final Connection connection = null) {
+        try (final Connection connection = DriverManager.getConnection(H2_URL, USER, PASSWORD)) {
             assertThat(connection.isValid(1)).isTrue();
         }
     }
@@ -49,7 +50,11 @@ class Stage0Test {
      */
     @Test
     void dataSource() throws SQLException {
-        final JdbcDataSource dataSource = null;
+        final JdbcDataSource dataSource = new JdbcDataSource();
+        // set??? 메서드로 설정해 줄 수도 있고.. yml 설정으로도 가능한 거 같음.
+        dataSource.setURL(H2_URL);
+        dataSource.setUser(USER);
+        dataSource.setPassword(PASSWORD);
 
         try (final var connection = dataSource.getConnection()) {
             assertThat(connection.isValid(1)).isTrue();

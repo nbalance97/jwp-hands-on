@@ -26,6 +26,7 @@ class Stage2Test {
      * DataSourceConfig 클래스를 찾아서 어떻게 빈으로 직접 생성하는지 확인해보자.
      * 그리고 아래 DataSource가 직접 생성한 빈으로 주입 받았는지 getPoolName() 메서드로 확인해보자.
      */
+
     @Autowired
     private DataSource dataSource;
 
@@ -33,6 +34,7 @@ class Stage2Test {
     void test() throws InterruptedException {
         final var hikariDataSource = (HikariDataSource) dataSource;
         final var hikariPool = getPool((HikariDataSource) dataSource);
+        System.out.println(((HikariDataSource) dataSource).getPoolName());
 
         // 설정한 커넥션 풀 최대값보다 더 많은 스레드를 생성해서 동시에 디비에 접근을 시도하면 어떻게 될까?
         final var threads = new Thread[20];
@@ -49,10 +51,10 @@ class Stage2Test {
         }
 
         // 동시에 많은 요청이 몰려도 최대 풀 사이즈를 유지한다.
-        assertThat(hikariPool.getTotalConnections()).isEqualTo(0);
+        assertThat(hikariPool.getTotalConnections()).isEqualTo(5);
 
         // DataSourceConfig 클래스에서 직접 생성한 커넥션 풀.
-        assertThat(hikariDataSource.getPoolName()).isEqualTo("");
+        assertThat(hikariDataSource.getPoolName()).isEqualTo("gugu");
     }
 
     // 데이터베이스에 연결만 하는 메서드. 커넥션 풀에 몇 개의 연결이 생기는지 확인하는 용도.
