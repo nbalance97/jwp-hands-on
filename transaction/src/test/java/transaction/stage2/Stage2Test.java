@@ -38,6 +38,7 @@ class Stage2Test {
     /**
      * 생성된 트랜잭션이 몇 개인가?
      * 왜 그런 결과가 나왔을까?
+     * Required는 이미 트랜잭션이 생성되었다면, 해당 트랜잭션을 그대로 사용하는 성질이 있다.
      */
     @Test
     void testRequired() {
@@ -45,13 +46,14 @@ class Stage2Test {
 
         log.info("transactions : {}", actual);
         assertThat(actual)
-                .hasSize(0)
-                .containsExactly("");
+                .hasSize(1)
+                .containsExactly("transaction.stage2.FirstUserService.saveFirstTransactionWithRequired");
     }
 
     /**
      * 생성된 트랜잭션이 몇 개인가?
      * 왜 그런 결과가 나왔을까?
+     * 두개. RequiredNew 옵션의 경우는, 새로운 트랜잭션을 만들어서 진행한다.
      */
     @Test
     void testRequiredNew() {
@@ -59,27 +61,32 @@ class Stage2Test {
 
         log.info("transactions : {}", actual);
         assertThat(actual)
-                .hasSize(0)
-                .containsExactly("");
+                .hasSize(2)
+                .containsExactly("transaction.stage2.SecondUserService.saveSecondTransactionWithRequiresNew",
+                        "transaction.stage2.FirstUserService.saveFirstTransactionWithRequiredNew");
     }
 
     /**
      * firstUserService.saveAndExceptionWithRequiredNew()에서 강제로 예외를 발생시킨다.
      * REQUIRES_NEW 일 때 예외로 인한 롤백이 발생하면서 어떤 상황이 발생하는 지 확인해보자.
+     * 외부 트랜잭션이 롤백이 되더라도 내부 트랜잭션이 롤백이 되지 않는다.
+     * 따라서 외부는 롤백, 내부는 db에 적용.
      */
     @Test
     void testRequiredNewWithRollback() {
-        assertThat(firstUserService.findAll()).hasSize(-1);
+        assertThat(firstUserService.findAll()).hasSize(0);
 
         assertThatThrownBy(() -> firstUserService.saveAndExceptionWithRequiredNew())
                 .isInstanceOf(RuntimeException.class);
 
-        assertThat(firstUserService.findAll()).hasSize(-1);
+        assertThat(firstUserService.findAll()).hasSize(1);
     }
 
     /**
      * FirstUserService.saveFirstTransactionWithSupports() 메서드를 보면 @Transactional이 주석으로 되어 있다.
      * 주석인 상태에서 테스트를 실행했을 때와 주석을 해제하고 테스트를 실행했을 때 어떤 차이점이 있는지 확인해보자.
+     * supports라면, 트랜잭션이 걸려있지 않는 메소드가 호출하는 경우, 트랜잭션이 걸려있지 않는다.
+     * 트랜잭션이 전파된 경우에는 트랜잭션을 사용한다.
      */
     @Test
     void testSupports() {
@@ -87,7 +94,7 @@ class Stage2Test {
 
         log.info("transactions : {}", actual);
         assertThat(actual)
-                .hasSize(0)
+                .hasSize(1)
                 .containsExactly("");
     }
 
@@ -95,6 +102,8 @@ class Stage2Test {
      * FirstUserService.saveFirstTransactionWithMandatory() 메서드를 보면 @Transactional이 주석으로 되어 있다.
      * 주석인 상태에서 테스트를 실행했을 때와 주석을 해제하고 테스트를 실행했을 때 어떤 차이점이 있는지 확인해보자.
      * SUPPORTS와 어떤 점이 다른지도 같이 챙겨보자.
+     * Mandatory : 트랜잭션이 존재한다면 전파되며, 존재하지 않다면 예외가 발생한다. REQUIRES_NEW랑 비교했을 때, 생성하지 않고
+     * 예외를 발생한다는 차이가 있다.
      */
     @Test
     void testMandatory() {
@@ -108,6 +117,7 @@ class Stage2Test {
 
     /**
      * 아래 테스트는 몇 개의 물리적 트랜잭션이 동작할까?
+     * NotSupported는 트랜잭션을 무시한다.
      * FirstUserService.saveFirstTransactionWithNotSupported() 메서드의 @Transactional을 주석 처리하자.
      * 다시 테스트를 실행하면 몇 개의 물리적 트랜잭션이 동작할까?
      *
@@ -119,13 +129,15 @@ class Stage2Test {
 
         log.info("transactions : {}", actual);
         assertThat(actual)
-                .hasSize(0)
-                .containsExactly("");
+                .hasSize(2);
+                //.containsExactly("");
     }
 
     /**
      * 아래 테스트는 왜 실패할까?
+     * Hibernate는 savePoint를 제공하지 않는다.
      * FirstUserService.saveFirstTransactionWithNested() 메서드의 @Transactional을 주석 처리하면 어떻게 될까?
+     * 에러가 발생하지 않는다. 내부 트랜잭션만 정상적으로 동작한다.
      */
     @Test
     void testNested() {
@@ -133,12 +145,14 @@ class Stage2Test {
 
         log.info("transactions : {}", actual);
         assertThat(actual)
-                .hasSize(0)
-                .containsExactly("");
+                .hasSize(1)
+                .containsExactly("transaction.stage2.SecondUserService.saveSecondTransactionWithNested");
     }
 
     /**
      * 마찬가지로 @Transactional을 주석처리하면서 관찰해보자.
+     * 현재 Transactional이 존재한다면 바로 예외를 터트려 버린다.
+     * 존재하지 않아야만 실행할 수 있다.
      */
     @Test
     void testNever() {
@@ -146,7 +160,7 @@ class Stage2Test {
 
         log.info("transactions : {}", actual);
         assertThat(actual)
-                .hasSize(0)
-                .containsExactly("");
+                .hasSize(1);
+                //.containsExactly("");
     }
 }
