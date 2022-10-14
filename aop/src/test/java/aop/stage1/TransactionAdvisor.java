@@ -13,11 +13,9 @@ public class TransactionAdvisor implements PointcutAdvisor {
 
     private final TransactionAdvice advice;
     private final TransactionPointcut pointcut;
-    private final UserService instance;
 
-    public TransactionAdvisor(TransactionAdvice advice, TransactionPointcut pointcut, UserService instance) {
+    public TransactionAdvisor(TransactionAdvice advice, TransactionPointcut pointcut) {
         this.pointcut = pointcut;
-        this.instance = instance;
         this.advice = advice;
     }
 
@@ -33,6 +31,6 @@ public class TransactionAdvisor implements PointcutAdvisor {
 
     @Override
     public boolean isPerInstance() {
-        return instance != null;
+        return true;
     }
 }

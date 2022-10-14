@@ -53,8 +53,7 @@ class Stage1Test {
         TransactionAdvice advice = new TransactionAdvice(platformTransactionManager);
         final TransactionAdvisor advisor = new TransactionAdvisor(
                 advice,
-                new TransactionPointcut(),
-                temporaryUserService
+                new TransactionPointcut()
         );
 
         // targetclass와 target을 동시에 설정해주면 엄청난 일이..? => 에러 터짐..ㅋ
@@ -78,8 +77,7 @@ class Stage1Test {
         TransactionAdvice advice = new TransactionAdvice(platformTransactionManager);
         final TransactionAdvisor advisor = new TransactionAdvisor(
                 advice,
-                new TransactionPointcut(),
-                temporaryUserService
+                new TransactionPointcut()
         );
 
         // targetclass와 target을 동시에 설정해주면 엄청난 일이..? => 에러 터짐..ㅋ
